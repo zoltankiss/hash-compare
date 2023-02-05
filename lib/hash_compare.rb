@@ -7,7 +7,7 @@ require_relative "../lib/traversal"
 class HashCompare
   class << self
     # This code is unfortunately not very pretty. It was
-    # intended as a interesting pontential real-world use case for my other
+    # intended as a quick and dirty interesting pontential real-world use case for my other
     # code, given how similar the output is to the format that
     # git uses. (e.g git rebase conflict). Could be very useful for large
     # hashes.
