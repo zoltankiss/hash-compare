@@ -12,7 +12,7 @@ class HashCompareTest < Minitest::Test
         "a2",
         "a3",
         {
-          "c" => ["d", true]
+          "c" => ["d", true, false]
         }
       ]
     }
@@ -40,6 +40,7 @@ class HashCompareTest < Minitest::Test
           <<<<<< hash1
           d
           true
+          false
           =======
           e
           d1
@@ -105,5 +106,25 @@ class HashCompareTest < Minitest::Test
     }
 
     assert_equal diff, HashCompare.diff(hash1, hash2, shallow: true)
+  end
+
+  def test_only_string_boolean_number_array_hash_allowed_as_values
+    invalid_obj_klass = Class.new
+
+    hash1 = {
+      "a" => "b",
+      "b" => invalid_obj_klass.new,
+      "c" => "c"
+    }
+
+    hash2 = {
+      "a" => "b",
+      "b" => "c",
+      "d" => "d"
+    }
+
+    assert_raises(Traversal::InvalidHashValueError) do
+      HashCompare.diff(hash1, hash2, shallow: false)
+    end
   end
 end

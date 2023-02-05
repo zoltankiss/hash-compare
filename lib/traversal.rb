@@ -7,6 +7,9 @@
 # irb> Traversal.traverse({ "a" => ["b", { "c" => "d" }] })
 # {["a"]=>["b"], ["a", "c"]=>["d"]}
 class Traversal
+  class InvalidHashValueError < StandardError
+  end
+
   class << self
     def traverse(obj)
       tracker_hash = {}
@@ -20,8 +23,16 @@ class Traversal
       !obj.respond_to?(:each)
     end
 
+    def validate_obj!(obj)
+      return if [TrueClass, FalseClass, String, Integer, Hash, Array].include?(obj.class)
+
+      raise InvalidHashValueError
+    end
+
     # rubocop:disable Metrics/MethodLength
     def traverse_helper(obj, prefix, tracker)
+      validate_obj!(obj)
+
       if basic_obj?(obj)
         tracker[prefix] ||= []
         tracker[prefix] << obj

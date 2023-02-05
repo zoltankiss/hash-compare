@@ -7,3 +7,7 @@ Style/StringLiterals:
 Metrics/MethodLength:
   Exclude:
     - 'test/**/*.rb'
+
+Metrics/ClassLength:
+  Exclude:
+    - 'test/**/*.rb'
