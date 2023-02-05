@@ -88,25 +88,25 @@ class HashCompare
     def diff(obj1, obj2, shallow: false)
       return shallow_diff(obj1, obj2) if shallow
 
-      h = Traversal.traverse(obj1)
-      h2 = Traversal.traverse(obj2)
-      h3 = {}
+      obj1_traversal = Traversal.traverse(obj1)
+      obj2_traversal = Traversal.traverse(obj2)
+      results = {}
 
-      h.each do |prefix, vals|
-        h3[prefix] ||= {}
+      obj1_traversal.each do |prefix, vals|
+        results[prefix] ||= {}
         vals.each do |val|
-          h3[prefix][val] = "-" if !h2[prefix] || !h2[prefix].include?(val)
+          results[prefix][val] = "-" if !obj2_traversal[prefix] || !obj2_traversal[prefix].include?(val)
         end
       end
 
-      h2.each do |prefix, vals|
-        h3[prefix] ||= {}
+      obj2_traversal.each do |prefix, vals|
+        results[prefix] ||= {}
         vals.each do |val|
-          h3[prefix][val] = "+" if !h[prefix] || !h[prefix].include?(val)
+          results[prefix][val] = "+" if !obj1_traversal[prefix] || !obj1_traversal[prefix].include?(val)
         end
       end
 
-      h3.reject { |_k, v| v.empty? }
+      results.reject { |_k, v| v.empty? }
     end
     # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
   end
