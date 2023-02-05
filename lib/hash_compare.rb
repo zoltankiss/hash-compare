@@ -2,6 +2,8 @@
 
 require_relative "../lib/traversal"
 
+# class with methods to discover the diff between two
+# objects, in particular, two hashes
 class HashCompare
   class << self
     # This code is unfortunately not very pretty. It was
@@ -29,29 +31,30 @@ class HashCompare
     #   c
     #   =======
     #   >>>>>> hash2
+    # rubocop:disable Style/SymbolProc, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
     def to_s(obj1, obj2)
       diff = diff(obj1, obj2, shallow: false)
       already_executed = {}
       lines = []
 
-      diff.to_a.sort { |e| e.length }.reverse.each do |e|
+      diff.to_a.sort { |el| el.length }.reverse.each do |e|
         k = e.first
-        v = e.last
 
         k.length.times do |k1|
           prefix = k[0..k1]
           next if already_executed[prefix]
-          lines << "#{'  '*k1}#{k[k1]} =>"
+
+          lines << "#{'  ' * k1}#{k[k1]} =>"
           if prefix.join("") != k && !already_executed[prefix] && diff[prefix]
-            lines << "#{'  '*(k1+1)}<<<<<< hash1"
-            diff[prefix].select { |k2, v2| v2 == "-" }.keys.each do |hash1e|
-              lines << "#{'  '*(k1+1)}#{hash1e}"
+            lines << "#{'  ' * (k1 + 1)}<<<<<< hash1"
+            diff[prefix].select { |_k2, v2| v2 == "-" }.each_key do |hash1e|
+              lines << "#{'  ' * (k1 + 1)}#{hash1e}"
             end
-            lines << "#{'  '*(k1+1)}======="
-            diff[prefix].select { |k2, v2| v2 == "+" }.keys.each do |hash1e|
-              lines << "#{'  '*(k1+1)}#{hash1e}"
+            lines << "#{'  ' * (k1 + 1)}======="
+            diff[prefix].select { |_k2, v2| v2 == "+" }.each_key do |hash1e|
+              lines << "#{'  ' * (k1 + 1)}#{hash1e}"
             end
-            lines << "#{'  '*(k1+1)}>>>>>> hash2"
+            lines << "#{'  ' * (k1 + 1)}>>>>>> hash2"
           end
           already_executed[prefix] = true
         end
@@ -59,23 +62,29 @@ class HashCompare
 
       lines.join("\n")
     end
+    # rubocop:enable Style/SymbolProc, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
 
-    def shallow_diff(obj1, obj2)
+    def keys_added(obj1, obj2)
       keys_added = obj2.keys - obj1.keys
       keys_subtracted = obj1.keys - obj2.keys
-      keys_diff = keys_added.to_h { |e| [e, "+"] }.merge(
+      keys_added.to_h { |e| [e, "+"] }.merge(
         keys_subtracted.to_h { |e| [e, "-"] }
       )
-
-      vals_added = obj2.values - obj1.values
-      vals_subtracted = obj1.values - obj2.values
-      vals_diff = vals_added.to_h { |e| [e, "+"] }.merge(
-        vals_subtracted.to_h { |e| [e, "-"] }
-      )
-
-      { keys_diff: keys_diff, vals_diff: vals_diff }
     end
 
+    def vals_diff(obj1, obj2)
+      vals_added = obj2.values - obj1.values
+      vals_subtracted = obj1.values - obj2.values
+      vals_added.to_h { |e| [e, "+"] }.merge(
+        vals_subtracted.to_h { |e| [e, "-"] }
+      )
+    end
+
+    def shallow_diff(obj1, obj2)
+      { keys_diff: keys_added(obj1, obj2), vals_diff: vals_diff(obj1, obj2) }
+    end
+
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
     def diff(obj1, obj2, shallow: false)
       return shallow_diff(obj1, obj2) if shallow
 
@@ -97,7 +106,8 @@ class HashCompare
         end
       end
 
-      h3.select {|k,v| !v.empty? }
+      h3.reject { |_k, v| v.empty? }
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
   end
 end

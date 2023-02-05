@@ -1,3 +1,11 @@
+# frozen_string_literal: true
+
+# class that traverses a nested object e.g hash of hashes,
+# and returns a hash where the keys are every path through the object.
+# e.g
+#
+# irb> Traversal.traverse({ "a" => ["b", { "c" => "d" }] })
+# {["a"]=>["b"], ["a", "c"]=>["d"]}
 class Traversal
   class << self
     def traverse(obj)
@@ -8,10 +16,11 @@ class Traversal
 
     private
 
-    def basic_obj?(e)
-      !e.respond_to?(:each)
+    def basic_obj?(obj)
+      !obj.respond_to?(:each)
     end
 
+    # rubocop:disable Metrics/MethodLength
     def traverse_helper(obj, prefix, tracker)
       if basic_obj?(obj)
         tracker[prefix] ||= []
@@ -26,5 +35,6 @@ class Traversal
         end
       end
     end
+    # rubocop:enable Metrics/MethodLength
   end
 end

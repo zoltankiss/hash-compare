@@ -23,32 +23,32 @@ class HashCompareTest < Minitest::Test
         "a2",
         "a4",
         {
-          "c" => ["e", "d1"]
+          "c" => %w[e d1]
         }
       ],
       "b" => "c"
     }
 
     results = <<~STRING
-a =>
-  <<<<<< hash1
-  a3
-  =======
-  a4
-  >>>>>> hash2
-  c =>
-    <<<<<< hash1
-    d
-    true
-    =======
-    e
-    d1
-    >>>>>> hash2
-b =>
-  <<<<<< hash1
-  =======
-  c
-  >>>>>> hash2
+      a =>
+        <<<<<< hash1
+        a3
+        =======
+        a4
+        >>>>>> hash2
+        c =>
+          <<<<<< hash1
+          d
+          true
+          =======
+          e
+          d1
+          >>>>>> hash2
+      b =>
+        <<<<<< hash1
+        =======
+        c
+        >>>>>> hash2
     STRING
 
     assert_equal results.strip, HashCompare.to_s(hash1, hash2).strip
@@ -71,7 +71,7 @@ b =>
         "a1",
         "a2",
         {
-          "c" => ["e", "d1"]
+          "c" => %w[e d1]
         }
       ],
       "b" => "c"
