@@ -64,7 +64,7 @@ class HashCompare
     end
     # rubocop:enable Style/SymbolProc, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
 
-    def keys_added(obj1, obj2)
+    def keys_diff(obj1, obj2)
       keys_added = obj2.keys - obj1.keys
       keys_subtracted = obj1.keys - obj2.keys
       keys_added.to_h { |e| [e, "+"] }.merge(
@@ -81,7 +81,7 @@ class HashCompare
     end
 
     def shallow_diff(obj1, obj2)
-      { keys_diff: keys_added(obj1, obj2), vals_diff: vals_diff(obj1, obj2) }
+      { keys_diff: keys_diff(obj1, obj2), vals_diff: vals_diff(obj1, obj2) }
     end
 
     # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
